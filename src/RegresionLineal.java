@@ -31,16 +31,6 @@ public class RegresionLineal {
         return new double[]{beta0(), beta1()};
     }
 
-    public double r() {
-        double numerador = n * sumaXY - sumaX * sumaY;
-        double denominador = Math.sqrt((n * sumaX2 - sumaX * sumaX) * (n * sumaY2 - sumaY * sumaY));
-        return numerador / denominador;
-    }
-
-    public double r2() {
-        return Math.pow(r(), 2);
-    }
-
     public double[] getPredictions(double[] X) {
         double[] predictions = new double[X.length];
         double b0 = beta0();

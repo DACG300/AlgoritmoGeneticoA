@@ -29,11 +29,9 @@ public class GeneticAlgorithm {
         int populationSize = population.length;
         double[][] selectedPopulation = new double[populationSize][population[0].length];
 
-        // Invert fitness if smaller fitness is better
-        double[] adjustedFitness = Arrays.stream(fitness).map(f -> 1 / (f + 1e-6)).toArray(); // Prevent division by zero
+        double[] adjustedFitness = Arrays.stream(fitness).map(f -> 1 / (f + 1e-6)).toArray();
         double totalAdjustedFitness = Arrays.stream(adjustedFitness).sum();
 
-        // Calculate probabilities
         double[] probabilities = new double[populationSize];
         for (int i = 0; i < populationSize; i++) {
             probabilities[i] = adjustedFitness[i] / totalAdjustedFitness;
@@ -41,7 +39,6 @@ public class GeneticAlgorithm {
 
         Random random = new Random();
 
-        // Selection process
         for (int i = 0; i < populationSize; i++) {
             double randValue = random.nextDouble();
             double cumulativeProbability = 0.0;
@@ -59,20 +56,18 @@ public class GeneticAlgorithm {
     }
 
     public double[][] crossover(double[][] population, double[] fitness) {
-        // Placeholder for crossover logic
         return population;
     }
 
     public void mutate(double[][] population) {
-        // Placeholder for mutation logic
     }
 
     public double[][] initializePopulation(int numIndividuals, int numGenes) {
         double[][] population = new double[numIndividuals][numGenes];
         Random rand = new Random();
         for (int i = 0; i < numIndividuals; i++) {
-            population[i][0] = rand.nextDouble() * 201; // Random value between 0 and 200
-            population[i][1] = rand.nextDouble() * 201; // Random value between 0 and 200
+            population[i][0] = rand.nextDouble() * 201;
+            population[i][1] = rand.nextDouble() * 201;
         }
         return population;
     }
@@ -82,20 +77,16 @@ public class GeneticAlgorithm {
         double[][] population = initializePopulation(populationSize, numGenes);
 
         for (int generation = 0; generation < numGenerations; generation++) {
-            // Evaluate fitness
             double[] fitness = new double[population.length];
             for (int i = 0; i < population.length; i++) {
                 fitness[i] = evaluateFitness(population[i], X, y);
             }
 
-            // Roulette Wheel Selection
             population = rouletteWheelSelection(population, fitness);
 
-            // Crossover and Mutation
             population = crossover(population, fitness);
             mutate(population);
 
-            // Track the best fitness for logging/debugging
             double bestFitness = Arrays.stream(fitness).min().getAsDouble();
         }
 
