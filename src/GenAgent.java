@@ -6,6 +6,7 @@ public class GenAgent extends Agent {
     @Override
     public void setup() {
         System.out.println("El agente GenAgent está listo.");
+
         addBehaviour(new OneShotBehaviour() {
             @Override
             public void action() {
@@ -17,13 +18,18 @@ public class GenAgent extends Agent {
     public void ejecutarOperacion() {
         System.out.println("Ejecutando operación.");
         addBehaviour(new GenBehaviour());
-        addBehaviour(new GenBehaviour() {
+
+        addBehaviour(new OneShotBehaviour() {
             @Override
             public void action() {
-                System.out.println("Operación finalizada.");
-                //myAgent.doDelete();
+                finalizarOperacion();
             }
         });
+    }
+
+    public void finalizarOperacion() {
+        System.out.println("Operación finalizada.");
+        doDelete();
     }
 
     @Override
