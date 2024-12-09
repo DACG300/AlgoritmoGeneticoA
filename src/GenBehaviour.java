@@ -25,6 +25,10 @@ public class GenBehaviour extends OneShotBehaviour {
 
         double[][] population = ga.run(X, Y);
         double[] bestCoefficients = ga.getBestCoefficients(population, X, Y);
+        int bestGeneration = ga.getBestGeneration();
+
+        System.out.println("\nMejor Generación Encontrada: " + (bestGeneration + 1));
+
 
         System.out.println("\nMejores coeficientes encontrados por el GA: " + Arrays.toString(bestCoefficients));
 
@@ -35,32 +39,12 @@ public class GenBehaviour extends OneShotBehaviour {
 
         System.out.println("Predicciones del algoritmo genético: " + Arrays.toString(predictionsGA));
 
-        double r2RegLin = calculateR2(Y, predictionsRegLin);
+        double r2RegLin = regLin.calculateR2(Y, predictionsRegLin);
         System.out.println("\nCorrelación cuadrada (R²) de la regresión lineal: " + r2RegLin);
 
-        double r2GA = calculateR2(Y, predictionsGA);
+        double r2GA = regLin.calculateR2(Y, predictionsGA);
         System.out.println("Correlación cuadrada (R²) del GA: " + r2GA);
     }
 
-    public double calculateR2(double[] actual, double[] predicted) {
-        if (actual.length != predicted.length) {
-            throw new IllegalArgumentException("Los arreglos deben tener el mismo tamaño.");
-        }
 
-        double sumSquaresTotal = 0.0;
-        double sumSquaresResidual = 0.0;
-        double meanActual = 0.0;
-
-        for (double value : actual) {
-            meanActual += value;
-        }
-        meanActual /= actual.length;
-
-        for (int i = 0; i < actual.length; i++) {
-            sumSquaresTotal += Math.pow(actual[i] - meanActual, 2);
-            sumSquaresResidual += Math.pow(actual[i] - predicted[i], 2);
-        }
-
-        return 1 - (sumSquaresResidual / sumSquaresTotal);
-    }
 }

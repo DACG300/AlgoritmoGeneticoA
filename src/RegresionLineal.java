@@ -41,4 +41,27 @@ public class RegresionLineal {
         }
         return predictions;
     }
+
+
+    public double calculateR2(double[] actual, double[] predicted) {
+        if (actual.length != predicted.length) {
+            throw new IllegalArgumentException("Los arreglos deben tener el mismo tamaño.");
+        }
+
+        double sumSquaresTotal = 0.0;
+        double sumSquaresResidual = 0.0;
+        double meanActual = 0.0;
+
+        for (double value : actual) {
+            meanActual += value;
+        }
+        meanActual /= actual.length;
+
+        for (int i = 0; i < actual.length; i++) {
+            sumSquaresTotal += Math.pow(actual[i] - meanActual, 2);
+            sumSquaresResidual += Math.pow(actual[i] - predicted[i], 2);
+        }
+
+        return 1 - (sumSquaresResidual / sumSquaresTotal);
+    }
 }

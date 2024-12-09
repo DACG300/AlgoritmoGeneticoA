@@ -2,11 +2,12 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class GeneticAlgorithm {
-    private double mutationRate;
-    private int populationSize;
-    private int numGenerations;
-    private double crossoverRate;
-    private double[] trueY;
+    protected double mutationRate;
+    protected int populationSize;
+    protected int numGenerations;
+    protected double crossoverRate;
+    protected double[] trueY;
+    protected int bestGeneration = -1;
 
     public GeneticAlgorithm(double mutationRate, int populationSize, int numGenerations, double crossoverRate, double[] trueY) {
         this.mutationRate = mutationRate;
@@ -14,6 +15,10 @@ public class GeneticAlgorithm {
         this.numGenerations = numGenerations;
         this.crossoverRate = crossoverRate;
         this.trueY = trueY;
+    }
+
+    public int getBestGeneration() {
+        return bestGeneration;
     }
 
     public double evaluateFitness(double[] coefficients, double[] X, double[] y) {
@@ -38,11 +43,9 @@ public class GeneticAlgorithm {
         }
 
         Random random = new Random();
-
         for (int i = 0; i < populationSize; i++) {
             double randValue = random.nextDouble();
             double cumulativeProbability = 0.0;
-
             for (int j = 0; j < populationSize; j++) {
                 cumulativeProbability += probabilities[j];
                 if (randValue <= cumulativeProbability) {
@@ -56,10 +59,43 @@ public class GeneticAlgorithm {
     }
 
     public double[][] crossover(double[][] population, double[] fitness) {
-        return population;
+        int populationSize = population.length;
+        double[][] newPopulation = new double[populationSize][population[0].length];
+        Random rand = new Random();
+
+        double[][] selectedParents = rouletteWheelSelection(population, fitness);
+
+        for (int i = 0; i < populationSize; i += 2) {
+            double[] parent1 = selectedParents[i];
+            double[] parent2 = selectedParents[i + 1];
+
+            int crossoverPoint = rand.nextInt(parent1.length);
+
+            for (int j = 0; j < parent1.length; j++) {
+                if (j < crossoverPoint) {
+                    newPopulation[i][j] = parent1[j];
+                    newPopulation[i + 1][j] = parent2[j];
+                } else {
+                    newPopulation[i][j] = parent2[j];
+                    newPopulation[i + 1][j] = parent1[j];
+                }
+            }
+        }
+
+        return newPopulation;
     }
 
     public void mutate(double[][] population) {
+        Random rand = new Random();
+
+        for (int i = 0; i < population.length; i++) {
+            if (rand.nextDouble() < mutationRate) {
+                int geneToMutate = rand.nextInt(population[i].length);
+                double mutationAmount = rand.nextGaussian() * 0.1;
+
+                population[i][geneToMutate] += mutationAmount;
+            }
+        }
     }
 
     public double[][] initializePopulation(int numIndividuals, int numGenes) {
@@ -75,6 +111,7 @@ public class GeneticAlgorithm {
     public double[][] run(double[] X, double[] y) {
         int numGenes = 2;
         double[][] population = initializePopulation(populationSize, numGenes);
+        double bestFitness = Double.MAX_VALUE;
 
         for (int generation = 0; generation < numGenerations; generation++) {
             double[] fitness = new double[population.length];
@@ -83,13 +120,16 @@ public class GeneticAlgorithm {
             }
 
             population = rouletteWheelSelection(population, fitness);
-
             population = crossover(population, fitness);
             mutate(population);
 
-            double bestFitness = Arrays.stream(fitness).min().getAsDouble();
+            double[] currentBestCoefficients = getBestCoefficients(population, X, y);
+            double currentBestFitness = evaluateFitness(currentBestCoefficients, X, y);
+            if (currentBestFitness < bestFitness) {
+                bestFitness = currentBestFitness;
+                bestGeneration = generation;
+            }
         }
-
         return population;
     }
 
